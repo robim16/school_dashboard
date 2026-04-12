@@ -1,0 +1,36 @@
+name: CI - Verificación de Calidad
+
+on:
+  pull_request:
+    branches: [main, develop]
+  push:
+    branches: [develop]
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install Dependencies
+        run: npm ci
+
+      - name: Linting
+        run: npm run lint
+
+      - name: Sub-Issue | Type Checking
+        run: npx tsc --noEmit
+
+      - name: Unit Tests
+        run: npm run test
+
+      - name: Build Test
+        run: npm run build
