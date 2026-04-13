@@ -1,5 +1,37 @@
 import { createClient } from '@/lib/supabase/server'
 
+/**
+ * @swagger
+ * /api/students/{studentId}/grades:
+ *   get:
+ *     summary: Obtener calificaciones de un estudiante
+ *     description: Retorna una lista de calificaciones para un estudiante especfico, incluyendo detalles de la leccin.
+ *     parameters:
+ *       - in: path
+ *         name: studentId
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: El ID del estudiante
+ *     responses:
+ *       200:
+ *         description: Lista de calificaciones obtenida exitosamente
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 type: object
+ *                 properties:
+ *                   id: {type: string}
+ *                   grade: {type: number}
+ *                   comments: {type: string}
+ *                   lessons:
+ *                     type: object
+ *                     properties:
+ *                       title: {type: string}
+ *                       start_time: {type: string}
+ */
 export async function getStudentGrades(studentId: string) {
   const supabase = createClient()
   const { data, error } = await supabase
@@ -19,6 +51,16 @@ export async function getStudentGrades(studentId: string) {
   return data
 }
 
+/**
+ * @swagger
+ * /api/teachers/classes:
+ *   get:
+ *     summary: Obtener clases del profesor
+ *     description: Retorna una lista de salones de clase junto con sus estudiantes.
+ *     responses:
+ *       200:
+ *         description: Lista de clases obtenida exitosamente
+ */
 export async function getTeacherClasses() {
   const supabase = createClient()
   const { data, error } = await supabase
@@ -37,6 +79,30 @@ export async function getTeacherClasses() {
   return data
 }
 
+/**
+ * @swagger
+ * /api/grades/{gradeId}:
+ *   patch:
+ *     summary: Actualizar una calificacin
+ *     parameters:
+ *       - in: path
+ *         name: gradeId
+ *         required: true
+ *         schema:
+ *           type: string
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               grade: {type: number}
+ *               comments: {type: string}
+ *     responses:
+ *       200:
+ *         description: Calificacin actualizada exitosamente
+ */
 export async function updateGrade(gradeId: string, grade: number, comments?: string) {
   const supabase = createClient()
   const { data, error } = await supabase
@@ -50,9 +116,18 @@ export async function updateGrade(gradeId: string, grade: number, comments?: str
   return data
 }
 
+/**
+ * @swagger
+ * /api/analytics:
+ *   get:
+ *     summary: Obtener analticas escolares
+ *     description: Retorna el total de estudiantes y el promedio de calificaciones. (Solo admin)
+ *     responses:
+ *       200:
+ *         description: Datos analticos obtenidos correctamente
+ */
 export async function getSchoolAnalytics() {
   const supabase = createClient()
-  // Admin only logic handled by RLS, but we can structure the query
   const { data: grades, error } = await supabase
     .from('grades')
     .select('grade')
@@ -65,3 +140,4 @@ export async function getSchoolAnalytics() {
     averageGrade: average.toFixed(2)
   }
 }
+
