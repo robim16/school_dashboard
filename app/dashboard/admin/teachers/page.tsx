@@ -4,15 +4,10 @@ import React, { useEffect, useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { DashboardShell } from '@/components/layout/dashboard-shell'
 import { createClient } from '@/lib/supabase/client'
-import { 
-  Search, 
-  Edit2, 
-  Trash2, 
-  X,
-  UserCheck
-} from 'lucide-react'
+import { UserCheck, Plus, Search, Edit2, Trash2, X } from 'lucide-react'
 import { toast } from 'sonner'
 import { Pagination } from '@/components/ui/pagination'
+import { registerTeacher } from '@/app/auth/actions'
 
 const PAGE_SIZE = 10
 
@@ -89,8 +84,17 @@ export default function AdminTeachersPage() {
         setIsModalOpen(false)
         fetchTeachers()
       }
+    } else {
+      // Registration logic
+      const result = await registerTeacher(formData)
+      if (result.error) {
+        toast.error(result.error)
+      } else {
+        toast.success('Teacher registered successfully. Default password: Welcome123!')
+        setIsModalOpen(false)
+        fetchTeachers()
+      }
     }
-    // Note: Inserting a new teacher is usually done via Auth/Signup trigger
   }
 
   const filtered = teachers.filter(t => 
@@ -120,6 +124,13 @@ export default function AdminTeachersPage() {
               className="w-full bg-black/40 border border-white/10 rounded-xl py-2 pl-10 pr-4 focus:outline-none focus:ring-1 focus:ring-neon-purple/30"
             />
           </div>
+          <button 
+            onClick={() => { setEditingTeacher(null); setIsModalOpen(true); }}
+            className="flex items-center gap-2 bg-neon-purple hover:bg-neon-purple/80 text-white px-6 py-2 rounded-xl font-bold transition-all shadow-[0_0_15px_rgba(188,19,254,0.3)] shrink-0"
+          >
+            <Plus size={18} />
+            Register Teacher
+          </button>
         </div>
 
         {/* Teachers Table */}
@@ -183,7 +194,7 @@ export default function AdminTeachersPage() {
             <div className="absolute inset-0 bg-black/80 backdrop-blur-sm" onClick={() => setIsModalOpen(false)} />
             <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="relative w-full max-w-md glass rounded-3xl border border-white/20 p-8">
               <div className="flex justify-between items-center mb-6">
-                <h3 className="text-xl font-bold">Edit Teacher Profile</h3>
+                <h3 className="text-xl font-bold">{editingTeacher ? 'Edit Teacher Profile' : 'Register New Teacher'}</h3>
                 <button onClick={() => setIsModalOpen(false)} className="text-gray-400 hover:text-white"><X size={24} /></button>
               </div>
               <form onSubmit={handleSave} className="space-y-4">
@@ -196,7 +207,7 @@ export default function AdminTeachersPage() {
                   <input name="email" type="email" defaultValue={editingTeacher?.email} required className="w-full bg-black/40 border border-white/10 rounded-xl py-2 px-4 focus:ring-1 focus:ring-neon-purple/30" />
                 </div>
                 <button type="submit" className="w-full bg-neon-purple text-white py-3 rounded-xl font-bold hover:shadow-neon-purple/50 transition-all mt-6 shadow-[0_0_15px_rgba(188,19,254,0.3)]">
-                  Save Profile
+                  {editingTeacher ? 'Save Profile' : 'Register Teacher'}
                 </button>
               </form>
             </motion.div>
