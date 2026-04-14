@@ -19,6 +19,7 @@ import {
   Bell,
   Search
 } from 'lucide-react'
+import { logout } from '@/app/auth/actions'
 
 interface SidebarItem {
   icon: React.ReactNode
@@ -132,7 +133,10 @@ export function DashboardShell({
         </nav>
 
         <div className="p-4 border-t border-white/10">
-          <button className="flex items-center gap-4 p-3 w-full rounded-xl hover:bg-red-500/10 text-gray-400 hover:text-red-400 transition-all">
+          <button 
+            onClick={() => logout()}
+            className="flex items-center gap-4 p-3 w-full rounded-xl hover:bg-red-500/10 text-gray-400 hover:text-red-400 transition-all"
+          >
             <LogOut size={20} />
             {isSidebarOpen && <span className="font-medium">Sign Out</span>}
           </button>
